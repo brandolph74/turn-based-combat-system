@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -25,12 +26,14 @@ public class Combat_System : MonoBehaviour
 
     public CombatHUD playerHUD;
     public CombatHUD enemyHUD;
-
+    
     public GameObject buttons;
+    
 
     // Start is called before the first frame update
     void Start()
     {
+        InputSystem.DisableDevice(Mouse.current);
         buttons.SetActive(false);
         state = CombatState.start;   //immediately launch the intro combat sequence
         //in the future create a Unity timeline here with easy animations of the UI and player sprites sliding in
