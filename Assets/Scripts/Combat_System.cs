@@ -31,6 +31,7 @@ public class Combat_System : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        buttons.SetActive(false);
         state = CombatState.start;   //immediately launch the intro combat sequence
         //in the future create a Unity timeline here with easy animations of the UI and player sprites sliding in
         

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
@@ -13,6 +14,10 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D rb;       //rigidbody of the player
     SpriteRenderer astroSprite;  //sprite renderer of the player
     Animator astroAnimator;  //animator of the player
+    
+    PlayerControls controls;  //input system for a controller
+
+    
 
     // Start is called before the first frame update
     void Start()
@@ -25,12 +30,17 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();  //get rigidbody of the player
         astroSprite = GetComponent<SpriteRenderer>();  //get the sprite renderer of the player
         astroAnimator = GetComponent<Animator>();     //get animator component of the player
-        
+
+        controls = new PlayerControls();  //instantiate the new input system script
+        controls.Enable();
     }
 
     // Update is called once per frame
     void Update()
     {
+        moveVector = controls.TopDown.Move.ReadValue<Vector2>().normalized; //create the vector based on the movement, normalized means diagnals are equidistance as horizontal and diagnal (always magnitude of 1)
+        
+        //put rigidbody velocity in fixedupdate for consistent movement
         
     }
 
@@ -43,7 +53,9 @@ public class PlayerMovement : MonoBehaviour
         float xMovement = 0f;   //initialize movement variables
         float yMovement = 0f;
        
-        #region
+        //old input system code used before the switch
+        
+        /*
         if (Input.GetKey(KeyCode.W))
         {
             yMovement = +1f;
@@ -60,22 +72,22 @@ public class PlayerMovement : MonoBehaviour
         {
             xMovement = +1f;
         }
-        #endregion
-
-
-        moveVector = new Vector3(xMovement, yMovement).normalized;  //create the vector based on the movement, normalized means diagnals are equidistance as horizontal and diagnal (always magnitude of 1)
-
+        */
+  
         rb.velocity = moveVector * speed;  //add the movement, the magnitude can be multiplied afterwards for more speed after normalizing
+
+        xMovement = moveVector.x;
+        yMovement = moveVector.y;
 
         if (xMovement != 0 || yMovement != 0)
         {
             astroAnimator.SetBool("isWalking", true);
 
-            if (xMovement ==  -1)    //if he is moving left
+            if (xMovement <  0)    //if he is moving left
             {
                 astroSprite.flipX = true;  //flip the sprite so it shows that he is walking left
             }
-            if (xMovement == 1)
+            if (xMovement > 0)
             {
                 astroSprite.flipX = false; //flip to right
             }
@@ -91,7 +103,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.tag == "Battle-able")
         {
-            if (Input.GetKey(KeyCode.Space))
+            if (controls.TopDown.Interact.IsPressed())
             {
                 PlayerPrefs.SetFloat("X", rb.position.x);
                 PlayerPrefs.SetFloat("Y", rb.position.y);
